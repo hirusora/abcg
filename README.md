@@ -14,11 +14,12 @@ You can view assignment applications developed by the repository author (Jonatha
 
 You can view example applications developed with ABCg by accessing the following pages:
 
-- [First App](https://github.com/hirusora/abcg/firstapp)
-- [Sierpinski](https://github.com/hirusora/abcg/sierpinski)
-- [Colored Triangles](https://github.com/hirusora/abcg/coloredtriangles)
-- [Regular Polygons](https://github.com/hirusora/abcg/regularpolygons)
-- [Asteroids](https://github.com/hirusora/abcg/asteroids)
+- [First App](https://hirusora.github.io/abcg/firstapp)
+- [Sierpinski](https://hirusora.github.io/abcg/sierpinski)
+- [Colored Triangles](https://hirusora.github.io/abcg/coloredtriangles)
+- [Regular Polygons](https://hirusora.github.io/abcg/regularpolygons)
+- [Asteroids](https://hirusora.github.io/abcg/asteroids)
+- [Load Model](https://hirusora.github.io/abcg/loadmodel)
 
 ## Credits
 
