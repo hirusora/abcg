@@ -5,7 +5,8 @@
 #add_subdirectory(coloredtriangles)
 #add_subdirectory(regularpolygons)
 #add_subdirectory(asteroids)
-add_subdirectory(loadmodel)
+#add_subdirectory(loadmodel)
+add_subdirectory(lookat)
 
 # Assignments
 #add_subdirectory(danmaku)
