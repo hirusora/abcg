@@ -20,6 +20,7 @@ You can view example applications developed with ABCg by accessing the following
 - [Regular Polygons](https://hirusora.github.io/abcg/regularpolygons)
 - [Asteroids](https://hirusora.github.io/abcg/asteroids)
 - [Load Model](https://hirusora.github.io/abcg/loadmodel)
+- [Load Model](https://hirusora.github.io/abcg/lookat)
 
 ## Credits
 
