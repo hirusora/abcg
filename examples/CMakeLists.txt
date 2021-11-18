@@ -7,7 +7,8 @@
 #add_subdirectory(asteroids)
 #add_subdirectory(loadmodel)
 #add_subdirectory(lookat)
-add_subdirectory(viewer1)
+#add_subdirectory(viewer1)
+add_subdirectory(starfield)
 
 # Assignments
 #add_subdirectory(danmaku)
