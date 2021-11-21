@@ -6,6 +6,8 @@
 #include "abcg.hpp"
 #include "camera.hpp"
 #include "entities/bullets.hpp"
+#include "entities/patterns/nuclear.hpp"
+#include "entities/patterns/waveparticle.hpp"
 
 class OpenGLWindow : public abcg::OpenGLWindow {
  protected:
@@ -25,7 +27,12 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
   Camera m_camera;
   Bullets m_bullets;
+  WaveParticlePattern m_waveParticlePattern{};
+  NuclearPattern m_nuclearPattern{};
 
+  unsigned long m_patternIndex{0};
+
+  void restart();
   void update();
 };
 

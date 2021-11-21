@@ -10,6 +10,8 @@ class Camera {
  public:
   void computeViewMatrix();
   void computeProjectionMatrix(int width, int height);
+
+  void restart();
   void update(float deltaTime);
 
  private:

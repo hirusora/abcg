@@ -20,7 +20,9 @@ void OpenGLWindow::initializeGL() {
   m_projMatrixLoc = abcg::glGetUniformLocation(m_program, "projMatrix");
 
   // Load models
-  m_bullets.initializeGL(m_program, getAssetsPath());
+  m_bullets.initializeGL(m_program, getAssetsPath() + "bullet.obj");
+
+  restart();
 
   resizeGL(getWindowSettings().width, getWindowSettings().height);
   m_camera.computeViewMatrix();
@@ -47,7 +49,44 @@ void OpenGLWindow::paintGL() {
   abcg::glUseProgram(0);
 }
 
-void OpenGLWindow::paintUI() { abcg::OpenGLWindow::paintUI(); }
+void OpenGLWindow::paintUI() {
+  abcg::OpenGLWindow::paintUI();
+  {
+    const auto widgetSize{ImVec2(218, 62)};
+    ImGui::SetNextWindowPos(ImVec2(m_viewportWidth - widgetSize.x - 5, 5));
+    ImGui::SetNextWindowSize(widgetSize);
+    ImGui::Begin("Widget window", nullptr, ImGuiWindowFlags_NoDecoration);
+
+    {
+      ImGui::PushItemWidth(120);
+      const std::vector<std::string> comboItems{"Nuclear", "Wave / Particle"};
+
+      if (ImGui::BeginCombo("Pattern", comboItems.at(m_patternIndex).c_str())) {
+        for (const auto index : iter::range(comboItems.size())) {
+          const bool isSelected{m_patternIndex == index};
+          if (ImGui::Selectable(comboItems.at(index).c_str(), isSelected)) {
+            m_patternIndex = index;
+            restart();
+          }
+          if (isSelected) {
+            ImGui::SetItemDefaultFocus();
+          }
+        }
+        ImGui::EndCombo();
+      }
+      ImGui::PopItemWidth();
+
+      ImGui::PushItemWidth(170);
+      if (ImGui::SliderFloat("FOV", &m_camera.m_FOV, 5.0f, 179.0f,
+                             "%.0f degrees")) {
+        m_camera.computeProjectionMatrix(m_viewportWidth, m_viewportHeight);
+      }
+      ImGui::PopItemWidth();
+    }
+
+    ImGui::End();
+  }
+}
 
 void OpenGLWindow::resizeGL(int width, int height) {
   m_viewportWidth = width;
@@ -60,8 +99,18 @@ void OpenGLWindow::terminateGL() {
   abcg::glDeleteProgram(m_program);
 }
 
+void OpenGLWindow::restart() {
+  m_camera.restart();
+  m_bullets.restart();
+  m_nuclearPattern.restart(&m_bullets);
+}
+
 void OpenGLWindow::update() {
   float deltaTime{static_cast<float>(getDeltaTime())};
   m_camera.update(deltaTime);
   m_bullets.update(deltaTime);
+
+  if (m_patternIndex == 0) {
+    m_nuclearPattern.update(deltaTime);
+  }
 }
