@@ -29,6 +29,8 @@ void OpenGLWindow::initializeGL() {
 }
 
 void OpenGLWindow::paintGL() {
+  if (m_restarting) return;
+
   update();
 
   // Clear color buffer and depth buffer
@@ -52,14 +54,14 @@ void OpenGLWindow::paintGL() {
 void OpenGLWindow::paintUI() {
   abcg::OpenGLWindow::paintUI();
   {
-    const auto widgetSize{ImVec2(218, 62)};
+    const auto widgetSize{ImVec2(230, 62)};
     ImGui::SetNextWindowPos(ImVec2(m_viewportWidth - widgetSize.x - 5, 5));
     ImGui::SetNextWindowSize(widgetSize);
     ImGui::Begin("Widget window", nullptr, ImGuiWindowFlags_NoDecoration);
 
     {
-      ImGui::PushItemWidth(120);
-      const std::vector<std::string> comboItems{"Nuclear", "Wave / Particle"};
+      ImGui::PushItemWidth(150);
+      const std::vector<std::string> comboItems{"Wave / Particle", "Nuclear"};
 
       if (ImGui::BeginCombo("Pattern", comboItems.at(m_patternIndex).c_str())) {
         for (const auto index : iter::range(comboItems.size())) {
@@ -100,17 +102,28 @@ void OpenGLWindow::terminateGL() {
 }
 
 void OpenGLWindow::restart() {
+  m_restarting = true;
+
   m_camera.restart();
   m_bullets.restart();
   m_nuclearPattern.restart(&m_bullets);
+  m_waveParticlePattern.restart(&m_bullets);
+
+  m_restarting = false;
 }
 
 void OpenGLWindow::update() {
+  if (m_restarting) return;
+
   float deltaTime{static_cast<float>(getDeltaTime())};
   m_camera.update(deltaTime);
   m_bullets.update(deltaTime);
 
-  if (m_patternIndex == 0) {
-    m_nuclearPattern.update(deltaTime);
+  switch (m_patternIndex) {
+    case 0:
+      m_waveParticlePattern.update(deltaTime);
+      break;
+    case 1:
+      m_nuclearPattern.update(deltaTime);
   }
 }

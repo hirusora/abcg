@@ -31,6 +31,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   NuclearPattern m_nuclearPattern{};
 
   unsigned long m_patternIndex{0};
+  bool m_restarting{false};
 
   void restart();
   void update();
