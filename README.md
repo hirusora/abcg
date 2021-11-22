@@ -9,6 +9,7 @@ Development framework accompanying the course MCTA008-17 Computer Graphics at [U
 You can view assignment applications developed by the repository author (Jonathan Takeshi Ywahashi) by using the following links:
 
 - [Danmaku](examples/danmaku) (first assignment)
+- [Sandan (Preview)](examples/sandanpreview) (second assignment)
 
 ## Examples
 
@@ -28,7 +29,7 @@ You can view example applications developed with ABCg by accessing the following
 
 Library and most examples developed by Harlen Batagelo.
 
-`Danmaku` application developed by Jonathan Takeshi Ywahashi.
+`Danmaku`, `Sandan (Preview)` applications developed by Jonathan Takeshi Ywahashi.
 
 ## License
 
