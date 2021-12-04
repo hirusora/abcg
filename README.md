@@ -27,6 +27,8 @@ You can view example applications developed with ABCg by accessing the following
 - [Viewer 2](https://hirusora.github.io/abcg/viewer2/)
 - [Viewer 3](https://hirusora.github.io/abcg/viewer3/)
 - [Viewer 4](https://hirusora.github.io/abcg/viewer4/)
+- [Viewer 5](https://hirusora.github.io/abcg/viewer5/)
+- [Viewer 6](https://hirusora.github.io/abcg/viewer6/)
 
 ## Credits
 
