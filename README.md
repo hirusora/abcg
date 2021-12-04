@@ -24,6 +24,7 @@ You can view example applications developed with ABCg by accessing the following
 - [LookAt](https://hirusora.github.io/abcg/lookat)
 - [Viewer 1](https://hirusora.github.io/abcg/viewer1/)
 - [Starfield](https://hirusora.github.io/abcg/starfield/)
+- [Viewer 2](https://hirusora.github.io/abcg/viewer2/)
 
 ## Credits
 

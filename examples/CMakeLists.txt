@@ -9,7 +9,8 @@
 #add_subdirectory(lookat)
 #add_subdirectory(viewer1)
 #add_subdirectory(starfield)
-add_subdirectory(sandanpreview)
+#add_subdirectory(sandanpreview)
+add_subdirectory(viewer2)
 
 # Assignments
 #add_subdirectory(danmaku)
