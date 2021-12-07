@@ -14,7 +14,8 @@
 #add_subdirectory(viewer3)
 #add_subdirectory(viewer4)
 #add_subdirectory(viewer5)
-add_subdirectory(viewer6)
+#add_subdirectory(viewer6)
+add_subdirectory(sandan)
 
 # Assignments
 #add_subdirectory(danmaku)
