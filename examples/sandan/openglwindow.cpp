@@ -82,8 +82,8 @@ void OpenGLWindow::initializeGL() {
   m_IsLoc = abcg::glGetUniformLocation(m_program, "Is");
 
   // Load models
-  // m_bullets.initializeGL(m_program,
-  //                        getAssetsPath() + "models/bullet/bullet.obj");
+  m_bullets.initializeGL(m_program,
+                         getAssetsPath() + "models/bullet/bullet.obj");
   m_ship.initializeGL(m_program,
                       getAssetsPath() + "models/spaceship/spaceship.obj");
   m_ufo.initializeGL(m_program, getAssetsPath() + "models/ufo/ufo.obj");
@@ -120,8 +120,8 @@ void OpenGLWindow::paintGL() {
   abcg::glUniform4fv(m_IdLoc, 1, &m_Id.x);
   abcg::glUniform4fv(m_IsLoc, 1, &m_Is.x);
 
-  // m_bullets.paintGL();
   m_ufo.paintGL(m_camera.m_viewMatrix);
+  m_bullets.paintGL(m_camera.m_viewMatrix);
   m_ship.paintGL(m_camera.m_viewMatrix);
 
   abcg::glUseProgram(0);
@@ -136,7 +136,7 @@ void OpenGLWindow::resizeGL(int width, int height) {
 }
 
 void OpenGLWindow::terminateGL() {
-  // m_bullets.terminateGL();
+  m_bullets.terminateGL();
   m_ship.terminateGL();
   m_ufo.terminateGL();
   abcg::glDeleteProgram(m_program);
@@ -148,9 +148,8 @@ void OpenGLWindow::restart() {
   m_camera.restart();
   m_ship.restart();
   m_ufo.restart();
-  // m_bullets.restart();
-  // m_nuclearPattern.restart(&m_bullets);
-  // m_waveParticlePattern.restart(&m_bullets);
+  m_bullets.restart();
+  m_waveParticlePattern.restart(&m_bullets);
 
   m_restarting = false;
 }
@@ -161,13 +160,7 @@ void OpenGLWindow::update() {
   float deltaTime{static_cast<float>(getDeltaTime())};
   m_ship.update(m_gameData, deltaTime);
   m_camera.update(m_gameData, deltaTime);
-  // m_bullets.update(deltaTime);
 
-  // switch (m_patternIndex) {
-  //   case 0:
-  //     m_waveParticlePattern.update(deltaTime);
-  //     break;
-  //   case 1:
-  //     m_nuclearPattern.update(deltaTime);
-  // }
+  m_bullets.update(deltaTime);
+  m_waveParticlePattern.update(deltaTime);
 }

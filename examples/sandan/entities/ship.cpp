@@ -28,9 +28,9 @@ void Ship::paintGL(glm::mat4 viewMatrix) {
   transform = glm::rotate(transform, m_rotation.y, glm::vec3(1.0f, 0.0f, 0.0f));
 
   glm::mat4 modelMatrix{1.0f};
-  modelMatrix = glm::scale(modelMatrix, glm::vec3(m_scale));
   modelMatrix = glm::translate(modelMatrix, m_translation);
   modelMatrix = transform * modelMatrix;
+  modelMatrix = glm::scale(modelMatrix, glm::vec3(m_scale));
   abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
 
   const auto modelViewMatrix{glm::mat3(viewMatrix * modelMatrix)};
@@ -52,7 +52,7 @@ void Ship::paintGL(glm::mat4 viewMatrix) {
 void Ship::terminateGL() { Model::terminateGL(); }
 
 void Ship::restart() {
-  m_translation = glm::vec3(0.0f, 0.0f, -1.0f);
+  m_translation = glm::vec3(0.0f, 0.0f, -1.0f + 2 * m_scale);
   m_rotation = glm::vec3(0.0f);
 }
 

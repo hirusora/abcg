@@ -48,7 +48,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   Ufo m_ufo;
   Bullets m_bullets;
   WaveParticlePattern m_waveParticlePattern{};
-  NuclearPattern m_nuclearPattern{};
+  // NuclearPattern m_nuclearPattern{};
 
   unsigned long m_patternIndex{0};
   bool m_restarting{false};

@@ -9,7 +9,7 @@
 class Bullets : Model {
  public:
   void initializeGL(GLuint program, std::string assetPath);
-  void paintGL();
+  void paintGL(glm::mat4 viewMatrix);
   void terminateGL();
 
   void restart();
@@ -32,7 +32,11 @@ class Bullets : Model {
  private:
   GLuint m_program;
   GLint m_modelMatrixLoc;
-  GLint m_colorLoc;
+  GLint m_normalMatrixLoc;
+  GLint m_shininessLoc;
+  GLint m_KaLoc;
+  GLint m_KdLoc;
+  GLint m_KsLoc;
 };
 
 #endif

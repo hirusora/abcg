@@ -25,7 +25,7 @@ void Camera::restart() {
   m_at = glm::vec3(0.0f, 0.0f, 0.0f);
   m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-  m_FOV = 20.0f;
+  m_FOV = 45.0f;
 }
 
 void Camera::update(GameData gameData, float deltaTime) {
