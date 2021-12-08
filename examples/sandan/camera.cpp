@@ -21,12 +21,14 @@ void Camera::setViewport(float width, float height) {
 }
 
 void Camera::restart() {
+  m_baseEye = glm::vec3(0.0f, 0.1f, -1.0f);
   m_eye = m_baseEye;
   m_at = glm::vec3(0.0f, 0.0f, 0.0f);
   m_up = glm::vec3(0.0f, 1.0f, 0.0f);
   m_rotation = glm::vec3(0.0f);
-
   m_FOV = 45.0f;
+  computeProjectionMatrix();
+  computeViewMatrix();
 }
 
 void Camera::update(GameData gameData, float deltaTime) {
