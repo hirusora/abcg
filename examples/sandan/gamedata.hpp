@@ -14,13 +14,13 @@ enum class Input {
   Backward,
   ZoomIn,
   ZoomOut,
-  Shot,
+  Shoot,
   Focus
 };
-enum class State { Menu, Playing, Finished };
+enum class State { Playing, Finished };
 
 struct GameData {
-  State m_state{State::Menu};
+  State m_state{State::Playing};
   std::bitset<10> m_input;
 };
 

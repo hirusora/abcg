@@ -25,7 +25,7 @@ void OpenGLWindow::handleEvent(SDL_Event& event) {
     if (event.key.keysym.sym == SDLK_RIGHT)
       m_gameData.m_input.set(static_cast<size_t>(Input::ZoomIn));
     if (event.key.keysym.sym == SDLK_SPACE)
-      m_gameData.m_input.set(static_cast<size_t>(Input::Shot));
+      m_gameData.m_input.set(static_cast<size_t>(Input::Shoot));
     if (event.key.keysym.sym == SDLK_LSHIFT ||
         event.key.keysym.sym == SDLK_RSHIFT ||
         event.key.keysym.sym == SDLK_LCTRL ||
@@ -50,7 +50,7 @@ void OpenGLWindow::handleEvent(SDL_Event& event) {
     if (event.key.keysym.sym == SDLK_RIGHT)
       m_gameData.m_input.reset(static_cast<size_t>(Input::ZoomIn));
     if (event.key.keysym.sym == SDLK_SPACE)
-      m_gameData.m_input.reset(static_cast<size_t>(Input::Shot));
+      m_gameData.m_input.reset(static_cast<size_t>(Input::Shoot));
     if (event.key.keysym.sym == SDLK_LSHIFT ||
         event.key.keysym.sym == SDLK_RSHIFT ||
         event.key.keysym.sym == SDLK_LCTRL ||
@@ -87,6 +87,7 @@ void OpenGLWindow::initializeGL() {
                       getAssetsPath() + "models/spaceship/spaceship.obj");
   m_ship.m_core.initializeGL(m_program,
                              getAssetsPath() + "models/shipcore/shipcore.obj");
+  m_shots.initializeGL(m_program, getAssetsPath() + "models/shot/shot.obj");
   m_ufo.initializeGL(m_program, getAssetsPath() + "models/ufo/ufo.obj");
   m_waveParticlePattern.initializeGL(getAssetsPath() +
                                      "models/bullet/textures/waveparticle");
@@ -122,13 +123,15 @@ void OpenGLWindow::paintGL() {
   abcg::glUniform4fv(m_IdLoc, 1, &m_Id.x);
   abcg::glUniform4fv(m_IsLoc, 1, &m_Is.x);
 
-  m_ufo.paintGL(m_camera.m_viewMatrix);
-  m_bullets.paintGL(m_camera.m_viewMatrix);
+  m_ufo.paintGL(m_gameData, m_camera.m_viewMatrix);
+  m_bullets.paintGL(m_gameData, m_camera.m_viewMatrix);
+  m_shots.paintGL(m_gameData, m_camera.m_viewMatrix);
 
   if (m_gameData.m_input[static_cast<size_t>(Input::Focus)]) {
-    m_ship.m_core.paintGL(m_camera.m_viewMatrix, m_ship.getCoreLocation());
+    m_ship.m_core.paintGL(m_gameData, m_camera.m_viewMatrix,
+                          m_ship.getCoreLocation());
   }
-  m_ship.paintGL(m_camera.m_viewMatrix);
+  m_ship.paintGL(m_gameData, m_camera.m_viewMatrix);
 
   abcg::glUseProgram(0);
 }
@@ -143,6 +146,7 @@ void OpenGLWindow::resizeGL(int width, int height) {
 
 void OpenGLWindow::terminateGL() {
   m_bullets.terminateGL();
+  m_shots.terminateGL();
   m_ship.terminateGL();
   m_ship.m_core.terminateGL();
   m_ufo.terminateGL();
@@ -155,6 +159,7 @@ void OpenGLWindow::restart() {
 
   m_camera.restart();
   m_ship.restart();
+  m_shots.restart();
   m_ufo.restart();
   m_bullets.restart();
   m_waveParticlePattern.restart(&m_bullets);
@@ -166,10 +171,15 @@ void OpenGLWindow::update() {
   if (m_restarting) return;
 
   float deltaTime{static_cast<float>(getDeltaTime())};
+
+  if (m_gameData.m_input[static_cast<size_t>(Input::Shoot)]) {
+    m_shots.createBullet(m_ship.getCoreLocation());
+  }
+
   m_ship.update(m_gameData, deltaTime);
   m_camera.update(m_gameData, deltaTime);
-
   m_bullets.update(deltaTime);
+  m_shots.update(deltaTime);
   m_waveParticlePattern.update(deltaTime);
 
   checkCollision();
@@ -177,13 +187,13 @@ void OpenGLWindow::update() {
 
 void OpenGLWindow::checkCollision() {
   // Check enemy collision
-  // for (auto& shot : m_shots.m_shots) {
-  //   auto distance{glm::distance(m_enemy.m_translation, shot.m_translation)};
-  //   if (distance < m_enemy.m_scale + m_shots.m_scale) {
-  //     m_enemy.m_hp -= shot.m_damage;
-  //     shot.m_dead = true;
-  //   }
-  // }
+  for (auto& shot : m_shots.m_shots) {
+    auto distance{glm::distance(m_ufo.getTranslation(), shot.m_translation)};
+    if (distance < m_ufo.getScale() + shot.m_scale) {
+      m_ufo.takeDamage(shot.m_damage);
+      shot.m_dead = true;
+    }
+  }
 
   // Check ship's core collision
   if (!m_ship.isInvulnerable()) {

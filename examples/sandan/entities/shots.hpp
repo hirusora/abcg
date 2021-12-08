@@ -1,5 +1,5 @@
-#ifndef BULLETS_HPP_
-#define BULLETS_HPP_
+#ifndef SHOTS_HPP_
+#define SHOTS_HPP_
 
 #include <vector>
 
@@ -7,7 +7,7 @@
 #include "abcg.hpp"
 #include "model.hpp"
 
-class Bullets : Model {
+class Shots : Model {
  public:
   void initializeGL(GLuint program, std::string path);
   void paintGL(GameData gameData, glm::mat4 viewMatrix);
@@ -15,20 +15,22 @@ class Bullets : Model {
 
   void restart();
   void update(float deltaTime);
+  void createBullet(glm::vec3 location);
 
-  struct Bullet {
-    int m_id{};
-
+  struct Shot {
     bool m_dead{false};
-    float m_scale{0.1f};
-    GLuint m_texture{};
+    float m_scale{0.01f};
+    int m_damage{1};
 
-    glm::vec3 m_translation{0.0f, 0.0f, 0.0f};
-    glm::vec3 m_velocity{0.0f, 0.0f, 0.0f};
-    glm::vec3 m_forward{1.0f, 0.0f, 0.0f};
+    glm::vec3 m_translation;
+    glm::vec3 m_velocity;
   };
 
-  std::vector<Bullet> m_bullets;
+  std::vector<Shot> m_shots;
+
+ private:
+  GLuint m_texture;
+  abcg::ElapsedTimer m_timer;
 };
 
 #endif

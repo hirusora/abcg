@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
     entities/model.cpp
     entities/ship.cpp
     entities/shipcore.cpp
+    entities/shots.cpp
     entities/ufo.cpp
     entities/bullets.cpp
     entities/patterns/waveparticle.cpp)

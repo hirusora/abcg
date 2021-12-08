@@ -8,7 +8,9 @@ void Bullets::initializeGL(GLuint program, std::string path) {
   restart();
 }
 
-void Bullets::paintGL(glm::mat4 viewMatrix) {
+void Bullets::paintGL(GameData gameData, glm::mat4 viewMatrix) {
+  if (gameData.m_state != State::Playing) return;
+
   for (auto bullet : m_bullets) {
     glm::mat4 modelMatrix{1.0f};
     modelMatrix = glm::translate(modelMatrix, bullet.m_translation);

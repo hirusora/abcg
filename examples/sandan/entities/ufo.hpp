@@ -10,12 +10,21 @@
 class Ufo : Model {
  public:
   void initializeGL(GLuint program, std::string path);
-  void paintGL(glm::mat4 viewMatrix);
+  void paintGL(GameData gameData, glm::mat4 viewMatrix);
   void terminateGL();
 
   void restart();
 
+  void takeDamage(int damage) { m_hp -= damage; };
+
+  float getScale() const { return m_scale; };
+  int getHP() { return m_hp; };
+  glm::vec3 getTranslation() { return m_translation; };
+
  private:
+  float m_scale{0.1f};
+  int m_baseHP{120};
+  int m_hp;
   glm::vec3 m_translation;
 };
 

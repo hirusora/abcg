@@ -10,7 +10,7 @@
 class ShipCore : Model {
  public:
   void initializeGL(GLuint program, std::string path);
-  void paintGL(glm::mat4 viewMatrix, glm::vec3 translation);
+  void paintGL(GameData gameData, glm::mat4 viewMatrix, glm::vec3 translation);
   void terminateGL();
 
   float getScale() const { return m_scale; };

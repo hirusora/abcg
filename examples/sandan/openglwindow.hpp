@@ -10,6 +10,7 @@
 #include "entities/patterns/waveparticle.hpp"
 #include "entities/ship.hpp"
 #include "entities/shipcore.hpp"
+#include "entities/shots.hpp"
 #include "entities/ufo.hpp"
 #include "gamedata.hpp"
 
@@ -47,6 +48,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   Ship m_ship;
   Ufo m_ufo;
   Bullets m_bullets;
+  Shots m_shots;
   WaveParticlePattern m_waveParticlePattern{};
   // NuclearPattern m_nuclearPattern{};
 

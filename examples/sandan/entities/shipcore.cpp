@@ -14,7 +14,10 @@ void ShipCore::initializeGL(GLuint program, std::string path) {
   }
 }
 
-void ShipCore::paintGL(glm::mat4 viewMatrix, glm::vec3 translation) {
+void ShipCore::paintGL(GameData gameData, glm::mat4 viewMatrix,
+                       glm::vec3 translation) {
+  if (gameData.m_state != State::Playing) return;
+
   glm::mat4 modelMatrix{1.0f};
   modelMatrix = glm::translate(modelMatrix, translation);
   modelMatrix = glm::scale(modelMatrix, glm::vec3(m_scale));
