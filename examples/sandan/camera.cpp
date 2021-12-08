@@ -24,6 +24,7 @@ void Camera::restart() {
   m_eye = m_baseEye;
   m_at = glm::vec3(0.0f, 0.0f, 0.0f);
   m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+  m_rotation = glm::vec3(0.0f);
 
   m_FOV = 45.0f;
 }

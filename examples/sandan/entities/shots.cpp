@@ -58,7 +58,8 @@ void Shots::createBullet(glm::vec3 location) {
 
   auto forward{glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - location)};
 
-  Shot shot{.m_translation = location, .m_velocity = forward};
+  Shot shot{.m_translation = location + forward * 0.1f,
+            .m_velocity = forward * 1.0f};
   m_shots.push_back(shot);
 
   m_timer.restart();

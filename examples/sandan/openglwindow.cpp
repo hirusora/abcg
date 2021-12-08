@@ -1,5 +1,6 @@
 #include "openglwindow.hpp"
 
+#include <fmt/core.h>
 #include <imgui.h>
 
 #include <cppitertools/itertools.hpp>
@@ -62,12 +63,26 @@ void OpenGLWindow::handleEvent(SDL_Event& event) {
 void OpenGLWindow::initializeGL() {
   abcg::glClearColor(0, 0, 0, 1);
 
+  // Load a new font
+  ImGuiIO& io{ImGui::GetIO()};
+  auto filename{getAssetsPath() + "fonts/KawashiroGothic-Lla5.ttf"};
+  m_font = io.Fonts->AddFontFromFileTTF(filename.c_str(), 60.0f);
+  m_font_desc = io.Fonts->AddFontFromFileTTF(filename.c_str(), 30.0f);
+  if (m_font == nullptr || m_font_desc == nullptr) {
+    throw abcg::Exception{abcg::Exception::Runtime("Cannot load font file")};
+  }
+
   // Enable depth buffering
   abcg::glEnable(GL_DEPTH_TEST);
 
   // Create program
   m_program = createProgramFromFile(getAssetsPath() + "shaders/model.vert",
                                     getAssetsPath() + "shaders/model.frag");
+  m_2dProgram = createProgramFromFile(getAssetsPath() + "shaders/model2d.vert",
+                                      getAssetsPath() + "shaders/model2d.frag");
+  m_skyboxProgram =
+      createProgramFromFile(getAssetsPath() + "shaders/skybox.vert",
+                            getAssetsPath() + "shaders/skybox.frag");
 
   // Get location of uniform variables
   m_viewMatrixLoc = abcg::glGetUniformLocation(m_program, "viewMatrix");
@@ -90,7 +105,10 @@ void OpenGLWindow::initializeGL() {
   m_shots.initializeGL(m_program, getAssetsPath() + "models/shot/shot.obj");
   m_ufo.initializeGL(m_program, getAssetsPath() + "models/ufo/ufo.obj");
   m_waveParticlePattern.initializeGL(getAssetsPath() +
-                                     "models/bullet/textures/waveparticle");
+                                     "models/bullet/textures/waveparticle/");
+  m_skybox.initializeGL(m_skyboxProgram,
+                        getAssetsPath() + "models/skybox/textures/");
+  m_healthBar.initializeGL(m_2dProgram);
 
   restart();
 
@@ -134,9 +152,76 @@ void OpenGLWindow::paintGL() {
   m_ship.paintGL(m_gameData, m_camera.m_viewMatrix);
 
   abcg::glUseProgram(0);
+
+  // Render skybox
+  abcg::glUseProgram(m_skyboxProgram);
+  m_skybox.paintGL(m_camera.m_projMatrix, m_camera.m_viewMatrix);
+  abcg::glUseProgram(0);
+
+  // Render 2D models
+  abcg::glUseProgram(m_2dProgram);
+  m_healthBar.paintGL(m_gameData);
+  abcg::glUseProgram(0);
 }
 
-void OpenGLWindow::paintUI() { abcg::OpenGLWindow::paintUI(); }
+void OpenGLWindow::paintUI() {
+  abcg::OpenGLWindow::paintUI();
+
+  if (m_gameData.m_state == State::Finished) {
+    const auto size{ImVec2(m_viewportWidth, m_viewportHeight)};
+    const auto position{ImVec2(0, 0)};
+    ImGui::SetNextWindowPos(position);
+    ImGui::SetNextWindowSize(size);
+    ImGuiWindowFlags flags{ImGuiWindowFlags_NoBackground |
+                           ImGuiWindowFlags_NoTitleBar |
+                           ImGuiWindowFlags_NoInputs};
+    ImGui::Begin(" ", nullptr, flags);
+
+    // Calculate each text size for centering.
+    ImGui::PushFont(m_font);
+    const auto message = "Enemy defeated!";
+    const auto messageSize = ImGui::CalcTextSize(message);
+    ImGui::PopFont();
+
+    ImGui::PushFont(m_font_desc);
+    const auto deathsMessage{fmt::format("Deaths: {}", m_ship.getDeaths())};
+    const auto deathsMessageSize = ImGui::CalcTextSize(deathsMessage.c_str());
+
+    const auto hours{(int)m_gameData.m_finishTime / 3600};
+    const auto minutes{((int)m_gameData.m_finishTime % 3600) / 60};
+    const auto seconds{(int)m_gameData.m_finishTime % 60};
+    const auto timeMessage{
+        fmt::format("Total time: {:02}:{:02}:{:02}", hours, minutes, seconds)};
+    const auto timeMessageSize = ImGui::CalcTextSize(timeMessage.c_str());
+    ImGui::PopFont();
+
+    const auto totalTextHeight{messageSize.y + deathsMessageSize.y +
+                               timeMessageSize.y};
+
+    // Print game finished message with centering
+    ImGui::PushFont(m_font);
+    ImGui::SetCursorPos(ImVec2((m_viewportWidth - messageSize.x) / 2,
+                               (m_viewportHeight - totalTextHeight) / 2));
+    ImGui::Text(message);
+    ImGui::PopFont();
+
+    ImGui::PushFont(m_font_desc);
+    ImGui::SetCursorPos(
+        ImVec2((m_viewportWidth - deathsMessageSize.x) / 2,
+               (m_viewportHeight - totalTextHeight) / 2 + messageSize.y));
+    ImGui::Text("%s", deathsMessage.c_str());
+    ImGui::PopFont();
+
+    ImGui::PushFont(m_font_desc);
+    ImGui::SetCursorPos(ImVec2((m_viewportWidth - timeMessageSize.x) / 2,
+                               (m_viewportHeight - totalTextHeight) / 2 +
+                                   messageSize.y + deathsMessageSize.y));
+    ImGui::Text("%s", timeMessage.c_str());
+    ImGui::PopFont();
+
+    ImGui::End();
+  }
+}
 
 void OpenGLWindow::resizeGL(int width, int height) {
   m_viewportWidth = width;
@@ -151,11 +236,20 @@ void OpenGLWindow::terminateGL() {
   m_ship.m_core.terminateGL();
   m_ufo.terminateGL();
   m_waveParticlePattern.terminateGL();
+  m_skybox.terminateGL();
+  m_healthBar.terminateGL();
+
   abcg::glDeleteProgram(m_program);
+  abcg::glDeleteProgram(m_2dProgram);
+  abcg::glDeleteProgram(m_skyboxProgram);
 }
 
 void OpenGLWindow::restart() {
   m_restarting = true;
+
+  m_gameData.m_state = State::Playing;
+  m_gameData.m_finishTime = 0;
+  m_gameData.m_gameTimer.restart();
 
   m_camera.restart();
   m_ship.restart();
@@ -163,12 +257,18 @@ void OpenGLWindow::restart() {
   m_ufo.restart();
   m_bullets.restart();
   m_waveParticlePattern.restart(&m_bullets);
+  m_healthBar.restart();
 
   m_restarting = false;
 }
 
 void OpenGLWindow::update() {
   if (m_restarting) return;
+
+  if (m_gameData.m_state == State::Finished &&
+      m_gameData.m_restartTimer.elapsed() >= 5) {
+    restart();
+  }
 
   float deltaTime{static_cast<float>(getDeltaTime())};
 
@@ -181,8 +281,12 @@ void OpenGLWindow::update() {
   m_bullets.update(deltaTime);
   m_shots.update(deltaTime);
   m_waveParticlePattern.update(deltaTime);
+  m_healthBar.update(m_gameData, m_ufo);
 
-  checkCollision();
+  if (m_gameData.m_state == State::Playing) {
+    checkCollision();
+    checkFinish();
+  }
 }
 
 void OpenGLWindow::checkCollision() {
@@ -204,5 +308,13 @@ void OpenGLWindow::checkCollision() {
         m_ship.takeHit();
       }
     }
+  }
+}
+
+void OpenGLWindow::checkFinish() {
+  if (m_ufo.getHP() <= 0) {
+    m_gameData.m_state = State::Finished;
+    m_gameData.m_finishTime = m_gameData.m_gameTimer.elapsed();
+    m_gameData.m_restartTimer.restart();
   }
 }

@@ -22,6 +22,10 @@ enum class State { Playing, Finished };
 struct GameData {
   State m_state{State::Playing};
   std::bitset<10> m_input;
+
+  float m_finishTime;
+  abcg::ElapsedTimer m_gameTimer;
+  abcg::ElapsedTimer m_restartTimer;
 };
 
 #endif

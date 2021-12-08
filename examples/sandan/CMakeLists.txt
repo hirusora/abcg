@@ -10,6 +10,8 @@ add_executable(${PROJECT_NAME}
     entities/shots.cpp
     entities/ufo.cpp
     entities/bullets.cpp
+    entities/skybox.cpp
+    entities/healthbar.cpp
     entities/patterns/waveparticle.cpp)
 
 enable_abcg(${PROJECT_NAME})

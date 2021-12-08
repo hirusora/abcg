@@ -19,6 +19,7 @@ class Ufo : Model {
 
   float getScale() const { return m_scale; };
   int getHP() { return m_hp; };
+  int getBaseHP() { return m_baseHP; };
   glm::vec3 getTranslation() { return m_translation; };
 
  private:

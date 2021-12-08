@@ -21,15 +21,26 @@ void Ship::paintGL(GameData gameData, glm::mat4 viewMatrix) {
   modelMatrix = transform * modelMatrix;
   modelMatrix = glm::scale(modelMatrix, glm::vec3(m_scale));
 
-  if (!m_focused) {
-    render(modelMatrix, viewMatrix);
-  } else {
-    abcg::glEnable(GL_BLEND);
-    abcg::glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
-    abcg::glBlendColor(0.0f, 0.0f, 0.0f, 0.2f);
-    render(modelMatrix, viewMatrix);
-    abcg::glDisable(GL_BLEND);
+  abcg::glEnable(GL_BLEND);
+  abcg::glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+  abcg::glBlendColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+  // Blinks while invulnerable
+  if (isInvulnerable()) {
+    if (m_invulnerableBlinkTimer.elapsed() > 0.2) {
+      m_invulnerableBlinkTimer.restart();
+    }
+    auto alpha{(m_invulnerableBlinkTimer.elapsed() < 0.1) ? 0.2f : 0.7f};
+    abcg::glBlendColor(0.0f, 0.0f, 0.0f, alpha);
   }
+
+  if (m_focused && !isInvulnerable()) {
+    abcg::glBlendColor(0.0f, 0.0f, 0.0f, 0.2f);
+  }
+
+  render(modelMatrix, viewMatrix);
+
+  abcg::glDisable(GL_BLEND);
 }
 
 void Ship::terminateGL() { Model::terminateGL(); }
@@ -40,10 +51,15 @@ void Ship::restart() {
   m_translation = glm::vec3(0.0f, 0.0f, -0.8f);
   m_rotation = glm::vec3(0.0f);
   m_invulnerableTimer.restart();
+  m_state = ShipState::Normal;
 }
 
 void Ship::update(GameData gameData, float deltaTime) {
   m_focused = gameData.m_input[static_cast<size_t>(Input::Focus)];
+
+  if (isInvulnerable() && m_invulnerableTimer.elapsed() >= 1) {
+    m_state = ShipState::Normal;
+  }
 
   // Camera movement
   const auto limit{static_cast<float>(M_PI_2 - M_PI_2 / 10)};
@@ -88,5 +104,7 @@ glm::vec3 Ship::getCoreLocation() {
 
 void Ship::takeHit() {
   m_deaths++;
+  m_state = ShipState::Invulnerable;
   m_invulnerableTimer.restart();
+  m_invulnerableBlinkTimer.restart();
 }
