@@ -9,6 +9,7 @@
 #include "entities/patterns/nuclear.hpp"
 #include "entities/patterns/waveparticle.hpp"
 #include "entities/ship.hpp"
+#include "entities/shipcore.hpp"
 #include "entities/ufo.hpp"
 #include "gamedata.hpp"
 
@@ -28,7 +29,6 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   GLint m_diffuseTexLoc{};
   GLint m_normalTexLoc{};
   GLint m_cubeTexLoc{};
-  GLint m_mappingModeLoc{};
   GLint m_lightDirLoc{};
   GLint m_IaLoc{};
   GLint m_IdLoc{};
@@ -55,6 +55,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
 
   void restart();
   void update();
+  void checkCollision();
 };
 
 #endif

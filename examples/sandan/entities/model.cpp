@@ -5,6 +5,7 @@
 
 #include <cppitertools/itertools.hpp>
 #include <filesystem>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtx/hash.hpp>
 #include <unordered_map>
 
@@ -20,6 +21,12 @@ struct hash<Vertex> {
   }
 };
 }  // namespace std
+
+void Model::initializeGL(GLuint program, std::string_view path) {
+  loadObj(path, true);
+  setupVAO(program);
+  setupLocators(program);
+}
 
 void Model::computeNormals() {
   // Clear previous vertex normals
@@ -283,7 +290,18 @@ void Model::loadObj(std::string_view path, bool standardize) {
   createBuffers();
 }
 
-void Model::render(int numTriangles) const {
+void Model::render(glm::mat4 modelMatrix, glm::mat4 viewMatrix) const {
+  const auto modelViewMatrix{glm::mat3(viewMatrix * modelMatrix)};
+  const glm::mat3 normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+
+  abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+  abcg::glUniformMatrix3fv(m_normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
+  abcg::glUniform1f(m_shininessLoc, m_shininess);
+  abcg::glUniform1i(m_mappingModeLoc, m_mappingMode);
+  abcg::glUniform4fv(m_KaLoc, 1, &m_Ka.x);
+  abcg::glUniform4fv(m_KdLoc, 1, &m_Kd.x);
+  abcg::glUniform4fv(m_KsLoc, 1, &m_Ks.x);
+
   abcg::glBindVertexArray(m_VAO);
 
   abcg::glActiveTexture(GL_TEXTURE0);
@@ -303,10 +321,7 @@ void Model::render(int numTriangles) const {
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   abcg::glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  const auto numIndices{(numTriangles < 0) ? m_indices.size()
-                                           : numTriangles * 3};
-
-  abcg::glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(numIndices),
+  abcg::glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
                        GL_UNSIGNED_INT, nullptr);
 
   abcg::glBindVertexArray(0);
@@ -365,6 +380,16 @@ void Model::setupVAO(GLuint program) {
   // End of binding
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
   abcg::glBindVertexArray(0);
+}
+
+void Model::setupLocators(GLuint program) {
+  m_modelMatrixLoc = abcg::glGetUniformLocation(program, "modelMatrix");
+  m_normalMatrixLoc = abcg::glGetUniformLocation(program, "normalMatrix");
+  m_shininessLoc = abcg::glGetUniformLocation(program, "shininess");
+  m_KaLoc = abcg::glGetUniformLocation(program, "Ka");
+  m_KdLoc = abcg::glGetUniformLocation(program, "Kd");
+  m_KsLoc = abcg::glGetUniformLocation(program, "Ks");
+  m_mappingModeLoc = abcg::glGetUniformLocation(program, "mappingMode");
 }
 
 void Model::standardize() {

@@ -8,6 +8,9 @@
 
 class WaveParticlePattern {
  public:
+  void initializeGL(std::string path);
+  void terminateGL();
+
   void restart(Bullets* bullets);
   void update(float deltaTime);
 
@@ -33,6 +36,8 @@ class WaveParticlePattern {
       glm::vec4(140.0f, 20.0f, 252.0f, 255.0f) / 255.0f,  // Indigo
       glm::vec4(150.0f, 54.0f, 148.0f, 255.0f) / 255.0f,  // Violet
   };
+
+  std::vector<GLuint> m_textures{};
 
   void createBullet(glm::vec3 velocity);
   void randomizeTargets();

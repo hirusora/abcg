@@ -21,7 +21,7 @@ void Camera::setViewport(float width, float height) {
 }
 
 void Camera::restart() {
-  m_eye = m_eyePosition;
+  m_eye = m_baseEye;
   m_at = glm::vec3(0.0f, 0.0f, 0.0f);
   m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -30,8 +30,15 @@ void Camera::restart() {
 
 void Camera::update(GameData gameData, float deltaTime) {
   // Camera movement
-  const auto angularVelocity{static_cast<float>(M_PI_4)};
   const auto limit{static_cast<float>(M_PI_2 - M_PI_2 / 10)};
+  auto angularVelocity{static_cast<float>(M_PI_4)};
+  auto velocity{0.5f};
+  auto zoomVelocity{20.0f};
+
+  if (gameData.m_input[static_cast<size_t>(Input::Focus)]) {
+    angularVelocity /= 2.0f;
+    velocity /= 2.0f;
+  }
 
   if (gameData.m_input[static_cast<size_t>(Input::Left)]) {
     m_rotation.x -= angularVelocity * deltaTime;
@@ -47,40 +54,29 @@ void Camera::update(GameData gameData, float deltaTime) {
   }
   m_rotation.y = glm::clamp(m_rotation.y, -limit, limit);
 
+  // Forward and backward movement
+  if (gameData.m_input[static_cast<size_t>(Input::Forward)]) {
+    m_baseEye.z += velocity * deltaTime;
+  }
+  if (gameData.m_input[static_cast<size_t>(Input::Backward)]) {
+    m_baseEye.z -= velocity * deltaTime;
+  }
+  m_baseEye.z = glm::clamp(m_baseEye.z, -1.0f, -0.5f);
+
+  // Zoom update
+  if (gameData.m_input[static_cast<size_t>(Input::ZoomIn)]) {
+    m_FOV -= zoomVelocity * deltaTime;
+  }
+  if (gameData.m_input[static_cast<size_t>(Input::ZoomOut)]) {
+    m_FOV += zoomVelocity * deltaTime;
+  }
+  m_FOV = glm::clamp(m_FOV, 20.0f, 70.0f);
+  computeProjectionMatrix();
+
+  // Eye position update
   auto transform{glm::mat4(1.0f)};
   transform = glm::rotate(transform, m_rotation.x, glm::vec3(0, 1, 0));
   transform = glm::rotate(transform, m_rotation.y, glm::vec3(1, 0, 0));
-  m_eye = transform * glm::vec4(m_eyePosition, 1.0f);
+  m_eye = transform * glm::vec4(m_baseEye, 1.0f);
   computeViewMatrix();
-
-  auto stepChanged{false};
-  auto step{1.0f * deltaTime};
-  if (gameData.m_input[static_cast<size_t>(Input::Forward)]) {
-    stepChanged = true;
-  }
-  if (gameData.m_input[static_cast<size_t>(Input::Backward)]) {
-    stepChanged = true;
-    step *= -1;
-  }
-
-  auto zoomChanged{false};
-  auto zoom{20.0f * deltaTime};
-  if (gameData.m_input[static_cast<size_t>(Input::ZoomIn)]) {
-    zoomChanged = true;
-    zoom *= -1;
-  }
-  if (gameData.m_input[static_cast<size_t>(Input::ZoomOut)]) {
-    zoomChanged = true;
-  }
-
-  if (stepChanged) {
-    auto z = glm::clamp(m_eye.z + step, -2.4f, -1.6f);
-    m_eye.z = z;
-    computeViewMatrix();
-  }
-
-  if (zoomChanged) {
-    m_FOV = glm::clamp(m_FOV + zoom, 10.0f, 45.0f);
-    computeProjectionMatrix();
-  }
 }

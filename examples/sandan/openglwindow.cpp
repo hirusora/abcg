@@ -75,7 +75,6 @@ void OpenGLWindow::initializeGL() {
   m_diffuseTexLoc = abcg::glGetUniformLocation(m_program, "diffuseTex");
   m_normalTexLoc = abcg::glGetUniformLocation(m_program, "normalTex");
   m_cubeTexLoc = abcg::glGetUniformLocation(m_program, "cubeTex");
-  m_mappingModeLoc = abcg::glGetUniformLocation(m_program, "mappingMode");
   m_lightDirLoc = abcg::glGetUniformLocation(m_program, "lightDirWorldSpace");
   m_IaLoc = abcg::glGetUniformLocation(m_program, "Ia");
   m_IdLoc = abcg::glGetUniformLocation(m_program, "Id");
@@ -86,7 +85,11 @@ void OpenGLWindow::initializeGL() {
                          getAssetsPath() + "models/bullet/bullet.obj");
   m_ship.initializeGL(m_program,
                       getAssetsPath() + "models/spaceship/spaceship.obj");
+  m_ship.m_core.initializeGL(m_program,
+                             getAssetsPath() + "models/shipcore/shipcore.obj");
   m_ufo.initializeGL(m_program, getAssetsPath() + "models/ufo/ufo.obj");
+  m_waveParticlePattern.initializeGL(getAssetsPath() +
+                                     "models/bullet/textures/waveparticle");
 
   restart();
 
@@ -114,7 +117,6 @@ void OpenGLWindow::paintGL() {
   abcg::glUniform1i(m_diffuseTexLoc, 0);
   abcg::glUniform1i(m_normalTexLoc, 1);
   abcg::glUniform1i(m_cubeTexLoc, 2);
-  abcg::glUniform1i(m_mappingModeLoc, 3);
   abcg::glUniform4fv(m_lightDirLoc, 1, &m_lightDir.x);
   abcg::glUniform4fv(m_IaLoc, 1, &m_Ia.x);
   abcg::glUniform4fv(m_IdLoc, 1, &m_Id.x);
@@ -122,6 +124,10 @@ void OpenGLWindow::paintGL() {
 
   m_ufo.paintGL(m_camera.m_viewMatrix);
   m_bullets.paintGL(m_camera.m_viewMatrix);
+
+  if (m_gameData.m_input[static_cast<size_t>(Input::Focus)]) {
+    m_ship.m_core.paintGL(m_camera.m_viewMatrix, m_ship.getCoreLocation());
+  }
   m_ship.paintGL(m_camera.m_viewMatrix);
 
   abcg::glUseProgram(0);
@@ -138,7 +144,9 @@ void OpenGLWindow::resizeGL(int width, int height) {
 void OpenGLWindow::terminateGL() {
   m_bullets.terminateGL();
   m_ship.terminateGL();
+  m_ship.m_core.terminateGL();
   m_ufo.terminateGL();
+  m_waveParticlePattern.terminateGL();
   abcg::glDeleteProgram(m_program);
 }
 
@@ -163,4 +171,28 @@ void OpenGLWindow::update() {
 
   m_bullets.update(deltaTime);
   m_waveParticlePattern.update(deltaTime);
+
+  checkCollision();
+}
+
+void OpenGLWindow::checkCollision() {
+  // Check enemy collision
+  // for (auto& shot : m_shots.m_shots) {
+  //   auto distance{glm::distance(m_enemy.m_translation, shot.m_translation)};
+  //   if (distance < m_enemy.m_scale + m_shots.m_scale) {
+  //     m_enemy.m_hp -= shot.m_damage;
+  //     shot.m_dead = true;
+  //   }
+  // }
+
+  // Check ship's core collision
+  if (!m_ship.isInvulnerable()) {
+    auto core{m_ship.getCoreLocation()};
+    for (auto bullet : m_bullets.m_bullets) {
+      auto distance{glm::distance(core, bullet.m_translation)};
+      if (distance < m_ship.m_core.getScale() * 0.9f + bullet.m_scale * 0.9f) {
+        m_ship.takeHit();
+      }
+    }
+  }
 }

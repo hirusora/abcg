@@ -23,7 +23,7 @@ class Camera {
  private:
   friend OpenGLWindow;
 
-  const glm::vec3 m_eyePosition{0.0f, 0.1f, -1.0f};
+  glm::vec3 m_baseEye{0.0f, 0.1f, -1.0f};
 
   glm::vec3 m_eye;
   glm::vec3 m_at;

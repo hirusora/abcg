@@ -8,7 +8,7 @@
 
 class Bullets : Model {
  public:
-  void initializeGL(GLuint program, std::string assetPath);
+  void initializeGL(GLuint program, std::string path);
   void paintGL(glm::mat4 viewMatrix);
   void terminateGL();
 
@@ -20,7 +20,7 @@ class Bullets : Model {
 
     bool m_dead{false};
     float m_scale{0.1f};
-    glm::vec4 m_color{1.0f, 1.0f, 1.0f, 1.0f};
+    GLuint m_texture{};
 
     glm::vec3 m_translation{0.0f, 0.0f, 0.0f};
     glm::vec3 m_velocity{0.0f, 0.0f, 0.0f};
@@ -28,15 +28,6 @@ class Bullets : Model {
   };
 
   std::vector<Bullet> m_bullets;
-
- private:
-  GLuint m_program;
-  GLint m_modelMatrixLoc;
-  GLint m_normalMatrixLoc;
-  GLint m_shininessLoc;
-  GLint m_KaLoc;
-  GLint m_KdLoc;
-  GLint m_KsLoc;
 };
 
 #endif

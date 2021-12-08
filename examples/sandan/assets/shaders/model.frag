@@ -197,7 +197,6 @@ void main() {
   if (gl_FrontFacing) {
     outColor = color;
   } else {
-    float i = (color.r + color.g + color.b) / 3.0;
-    outColor = vec4(i, 0, 0, 1.0);
+    outColor = vec4(0, 0, 0, 1.0);
   }
 }

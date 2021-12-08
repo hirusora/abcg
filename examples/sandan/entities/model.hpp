@@ -21,36 +21,38 @@ struct Vertex {
 
 class Model {
  public:
+  void initializeGL(GLuint program, std::string_view path);
+  void terminateGL();
+
   void loadCubeTexture(const std::string& path);
   void loadDiffuseTexture(std::string_view path);
   void loadNormalTexture(std::string_view path);
   void loadObj(std::string_view path, bool standardize = true);
-  void render(int numTriangles = -1) const;
+  void render(glm::mat4 modelMatrix, glm::mat4 viewMatrix) const;
   void setupVAO(GLuint program);
-  void terminateGL();
+  void setupLocators(GLuint program);
 
-  [[nodiscard]] int getNumTriangles() const {
-    return static_cast<int>(m_indices.size()) / 3;
-  }
-
-  [[nodiscard]] glm::vec4 getKa() const { return m_Ka; }
-  [[nodiscard]] glm::vec4 getKd() const { return m_Kd; }
-  [[nodiscard]] glm::vec4 getKs() const { return m_Ks; }
-  [[nodiscard]] float getShininess() const { return m_shininess; }
-
-  [[nodiscard]] bool isUVMapped() const { return m_hasTexCoords; }
-
-  [[nodiscard]] GLuint getCubeTexture() const { return m_cubeTexture; }
+  void setDiffuseTexture(GLuint texture) { m_diffuseTexture = texture; };
+  void setMappingMode(int mode) { m_mappingMode = mode; };
 
  private:
   GLuint m_VAO{};
   GLuint m_VBO{};
   GLuint m_EBO{};
 
+  GLint m_modelMatrixLoc;
+  GLint m_normalMatrixLoc;
+  GLint m_KaLoc;
+  GLint m_KdLoc;
+  GLint m_KsLoc;
+  GLint m_shininessLoc;
+  GLint m_mappingModeLoc;
+
   glm::vec4 m_Ka{};
   glm::vec4 m_Kd{};
   glm::vec4 m_Ks{};
   float m_shininess{};
+  int m_mappingMode{3};
   GLuint m_diffuseTexture{};
   GLuint m_normalTexture{};
   GLuint m_cubeTexture{};

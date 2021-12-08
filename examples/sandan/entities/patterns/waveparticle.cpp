@@ -2,8 +2,24 @@
 
 #include <chrono>
 #include <cppitertools/range.hpp>
+#include <filesystem>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+
+void WaveParticlePattern::initializeGL(std::string path) {
+  for (const auto& entry : std::filesystem::directory_iterator(path)) {
+    auto filePath{entry.path().c_str()};
+
+    if (!std::filesystem::exists(filePath)) continue;
+    m_textures.push_back(abcg::opengl::loadTexture(filePath));
+  }
+}
+
+void WaveParticlePattern::terminateGL() {
+  for (auto i : iter::range(m_textures.size())) {
+    abcg::glDeleteTextures(1, &m_textures[i]);
+  }
+}
 
 void WaveParticlePattern::restart(Bullets* bullets) {
   m_bullets = bullets;
@@ -79,11 +95,11 @@ void WaveParticlePattern::update(float deltaTime) {
 }
 
 void WaveParticlePattern::createBullet(glm::vec3 velocity) {
-  std::uniform_int_distribution ri(0, static_cast<int>(m_colors.size() - 1));
+  std::uniform_int_distribution ri(0, static_cast<int>(m_textures.size() - 1));
 
   Bullets::Bullet bullet{
       .m_scale = 0.05f,
-      .m_color = m_colors.at(ri(m_re)),
+      .m_texture = m_textures.at(ri(m_re)),
       .m_translation = glm::vec3(0.0f, 0.0f, 0.0f),
       .m_velocity = velocity,
       .m_forward = velocity,
