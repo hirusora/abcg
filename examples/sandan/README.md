@@ -42,10 +42,15 @@ Caso o programa esteja sendo executado no Google Chrome com baixa *performance*,
 ## Créditos
 
 Aplicação desenvolvida por Jonathan Takeshi Ywahashi.
+
 Modelo da esfera desenvolvido por thequinneffect ([link para o modelo](https://skfb.ly/6XEn7)).
+
 Texturas da esfera gerados por Jonathan Takeshi Ywahashi.
+
 Modelo e textura da nave desenvolvido por 3dhaupt ([link para o modelo](https://free3d.com/3d-model/intergalactic-spaceship-in-blender-28-eevee-394046.html)).
+
 Modelo e textura do UFO desenvolvido por printable_models ([link para o modelo](https://free3d.com/3d-model/ufo-saucer-v1--190141.html)).
+
 Textura do *skybox* desenvolvido por StumpyStrust ([link para o modelo](https://opengameart.org/content/space-skyboxes-0)).
 
 "S01C01 Low Poly Sphere" (https://skfb.ly/6XEn7) by thequinneffect is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
