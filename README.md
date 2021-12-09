@@ -10,6 +10,7 @@ You can view assignment applications developed by the repository author (Jonatha
 
 - [Danmaku](examples/danmaku) (first assignment)
 - [Sandan (Preview)](examples/sandanpreview) (second assignment)
+- [Sandan](examples/sandan) (third assignment)
 
 ## Examples
 
@@ -34,7 +35,7 @@ You can view example applications developed with ABCg by accessing the following
 
 Library and most examples developed by Harlen Batagelo.
 
-`Danmaku`, `Sandan (Preview)` applications developed by Jonathan Takeshi Ywahashi.
+`Danmaku`, `Sandan (Preview)` and `Sandan` applications developed by Jonathan Takeshi Ywahashi.
 
 ## License
 
